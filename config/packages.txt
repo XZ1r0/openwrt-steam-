@@ -4,4 +4,6 @@ dnsmasq-full
 firewall4
 nftables
 https-dns-proxy
-sing-box
+ca-bundle
+curl
+kmod-nft-tproxy

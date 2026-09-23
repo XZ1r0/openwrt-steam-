@@ -1,14 +1,57 @@
 name: Build OpenWrt
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: OpenWrt release
+        required: true
+        default: 23.05.5
+      extra_packages:
+        description: Extra ImageBuilder packages
+        required: false
+        default: ""
   push:
-    tags: [v*]
+    branches: [main]
+    tags: ["v*"]
+permissions:
+  contents: read
 jobs:
   build:
+    name: ${{ matrix.name }}
     runs-on: ubuntu-24.04
     strategy:
+      fail-fast: false
       matrix:
-        target: [x86/64, armsr/armv8, armsr/armv7]
+        include:
+          - name: x86_64
+            target: x86/64
+            archive_target: x86-64
+          - name: arm64
+            target: armsr/armv8
+            archive_target: armsr-armv8
+          - name: armv7
+            target: armsr/armv7
+            archive_target: armsr-armv7
+    env:
+      OPENWRT_VERSION: ${{ inputs.version || '23.05.5' }}
+      EXTRA_PACKAGES: ${{ inputs.extra_packages || '' }}
     steps:
-      - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y curl zstd tar make
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: sudo apt-get update && sudo apt-get install -y curl zstd tar make
+
+      - name: Build firmware
+        env:
+          TARGET: ${{ matrix.target }}
+          ARCHIVE_TARGET: ${{ matrix.archive_target }}
+        run: bash scripts/build-imagebuilder.sh
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: openwrt-${{ env.OPENWRT_VERSION }}-${{ matrix.name }}
+          path: artifacts/${{ matrix.target == 'x86/64' && 'x86_64' || matrix.target == 'armsr/armv8' && 'armsr_armv8' || 'armsr_armv7' }}/
+          if-no-files-found: error
+          retention-days: 14
