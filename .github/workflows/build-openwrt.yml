@@ -1,0 +1,14 @@
+name: Build OpenWrt
+on:
+  workflow_dispatch:
+  push:
+    tags: [v*]
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        target: [x86/64, armsr/armv8, armsr/armv7]
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y curl zstd tar make
