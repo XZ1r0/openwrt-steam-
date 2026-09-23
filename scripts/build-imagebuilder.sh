@@ -6,6 +6,7 @@ TARGET="${TARGET:?TARGET is required}"
 ARCHIVE_TARGET="${ARCHIVE_TARGET:?ARCHIVE_TARGET is required}"
 OPENWRT_VERSION="${OPENWRT_VERSION:-23.05.5}"
 EXTRA_PACKAGES="${EXTRA_PACKAGES:-}"
+REMOVE_PACKAGES="${REMOVE_PACKAGES:-}"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 NAME="${TARGET////_}"
 WORK_DIR="$ROOT_DIR/.work/$NAME"
@@ -21,7 +22,7 @@ IMAGE_BUILDER="$(find "$WORK_DIR" -mindepth 1 -maxdepth 1 -type d -name 'openwrt
 test -n "$IMAGE_BUILDER"
 
 # 中文注释：逐行读取基础包，允许文件中保留空行和注释。
-PACKAGES="$(sed -e 's/[[:space:]]*#.*$//' -e '/^[[:space:]]*$/d' "$ROOT_DIR/config/packages.txt" | tr '\n' ' ') $EXTRA_PACKAGES"
+PACKAGES="$(sed -e 's/[[:space:]]*#.*$//' -e '/^[[:space:]]*$/d' "$ROOT_DIR/config/packages.txt" | tr '\n' ' ') $REMOVE_PACKAGES $EXTRA_PACKAGES"
 make -C "$IMAGE_BUILDER" image PROFILE=generic PACKAGES="$PACKAGES" BIN_DIR="$OUT_DIR"
 
 # 中文注释：为下载后的固件生成完整性校验文件。

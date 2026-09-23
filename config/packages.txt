@@ -1,5 +1,7 @@
 luci
 luci-ssl
+# 中文注释：ImageBuilder 默认包含 dnsmasq，先移除再安装 full 版本。
+-dnsmasq
 dnsmasq-full
 firewall4
 nftables

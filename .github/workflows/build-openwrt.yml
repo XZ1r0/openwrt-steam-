@@ -26,12 +26,15 @@ jobs:
           - name: x86_64
             target: x86/64
             archive_target: x86-64
+            remove_packages: ""
           - name: arm64
             target: armsr/armv8
             archive_target: armsr-armv8
+            remove_packages: "-kmod-amazon-ena -kmod-bcmgenet -kmod-dwmac-imx -kmod-dwmac-rockchip -kmod-dwmac-sun8i -kmod-fsl-dpaa1-net -kmod-fsl-dpaa2-net -kmod-fsl-enetc-net -kmod-fsl-fec -kmod-mvneta -kmod-mvpp2 -kmod-octeontx2-net -kmod-renesas-net-avb -kmod-thunderx-net"
           - name: armv7
             target: armsr/armv7
             archive_target: armsr-armv7
+            remove_packages: "-kmod-amazon-ena -kmod-bcmgenet -kmod-dwmac-imx -kmod-dwmac-rockchip -kmod-dwmac-sun8i -kmod-fsl-dpaa1-net -kmod-fsl-dpaa2-net -kmod-fsl-enetc-net -kmod-fsl-fec -kmod-mvneta -kmod-mvpp2 -kmod-octeontx2-net -kmod-renesas-net-avb -kmod-thunderx-net"
     env:
       OPENWRT_VERSION: ${{ inputs.version || '23.05.5' }}
       EXTRA_PACKAGES: ${{ inputs.extra_packages || '' }}
@@ -46,6 +49,7 @@ jobs:
         env:
           TARGET: ${{ matrix.target }}
           ARCHIVE_TARGET: ${{ matrix.archive_target }}
+          REMOVE_PACKAGES: ${{ matrix.remove_packages }}
         run: bash scripts/build-imagebuilder.sh
 
       - name: Upload firmware
