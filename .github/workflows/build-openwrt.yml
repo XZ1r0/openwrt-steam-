@@ -87,6 +87,8 @@ jobs:
       - name: Create release
         env:
           GH_TOKEN: ${{ github.token }}
+          # 中文注释：Release Job 未检出仓库，显式指定 gh CLI 操作的远程仓库。
+          GH_REPO: ${{ github.repository }}
         shell: bash
         run: |
           set -euo pipefail
